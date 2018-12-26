@@ -7,11 +7,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
-use Exo\Loader\ServiceLoader;
+use Exo\Loader\PackageLoader;
 
 use RuntimeException;
 
-class ServiceCommand extends Command
+class PackageCommand extends Command
 {
     /**
      * {@inheritdoc}
@@ -21,13 +21,13 @@ class ServiceCommand extends Command
         $this->ignoreValidationErrors();
 
         $this
-            ->setName('service')
-            ->setDescription('Display service definition')
+            ->setName('package')
+            ->setDescription('Display package definition')
             ->addOption(
-                'config',
-                '-c',
+                'package',
+                '-p',
                 InputOption::VALUE_REQUIRED,
-                'Config file to load'
+                'Package configuration file to load'
             )
         ;
     }
@@ -37,16 +37,16 @@ class ServiceCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $serviceFilename = $input->getOption('config');
-        if (!$serviceFilename) {
-            $serviceFilename = 'exo.library.json';
+        $filename = $input->getOption('package');
+        if (!$filename) {
+            $filename = 'exo.package.json';
         }
 
-        $serviceLoader = new ServiceLoader();
-        $service = $serviceLoader->load($serviceFilename);
-        // print_r($serviceDefinition);
-        foreach ($service->getActions() as $a) {
-            $output->writeLn('<comment>' . $a->getName() . '</comment> ' . $a->getDescription());
+        $packageLoader = new PackageLoader();
+        $package = $packageLoader->load($filename);
+        // print_r($package);
+        foreach ($package->getActions() as $action) {
+            $output->writeLn('<comment>' . $action->getName() . '</comment> ' . $action->getDescription());
         }
     }
 }

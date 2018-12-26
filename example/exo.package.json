@@ -1,6 +1,6 @@
 {
-  "name": "The Hello Service",
-  "description": "Misc example actions to return Hello",
+  "name": "example",
+  "description": "Various example actions to return friendly greetings",
   "actions": [
     "hello-php/exo.action.json",
     "hello-node/exo.action.json",

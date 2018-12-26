@@ -6,10 +6,11 @@ use Collection\TypedArray;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
 
-class Service extends AbstractModel
+class Package extends AbstractModel
 {
     protected $name;
     protected $description;
+    protected $filename;
     protected $actions = [];
 
     public function __construct()
