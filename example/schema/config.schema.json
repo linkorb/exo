@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "required": [ "COLOR", "DB_URL" ],
+  "properties": {
+    "COLOR": {
+      "type": "string",
+      "description": "Color of the output",
+      "default": "Gray"
+    },
+    "DB_URL": {
+      "type": "string"
+    }
+  }
+}

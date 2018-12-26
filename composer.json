@@ -1,0 +1,31 @@
+{
+  "name": "linkorb/exo",
+  "description": "Exo Integration Engine: FaaS, Actions, Triggers",
+  "homepage": "http://www.github.com/linkorb/exo",
+  "keywords": ["func", "action", "trigger", "faas", "exo", "linkorb"],
+  "type": "library",
+  "authors": [
+    {
+      "name": "Joost Faassen",
+      "email": "j.faassen@linkorb.com",
+      "role": "Development"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "justinrainbow/json-schema": "^5.0",
+    "linkorb/boost": "^1.0",
+    "linkorb/collection": "^1.0",
+    "symfony/process": "^3.0|^4.0"
+  },
+  "require-dev": {
+    "symfony/dotenv": "^3.0|^4.0",
+    "symfony/console": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+        "Exo\\": "src/"
+    }
+  },
+  "license": "MIT"
+}

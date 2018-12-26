@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Dotenv\Dotenv;
+
+$filename = __DIR__ . '/../vendor/autoload.php';
+
+if (!file_exists($filename)) {
+    $filename = __DIR__ . '/../../../autoload.php';
+}
+
+if (!file_exists($filename)) {
+    die(
+        'You must set up the project dependencies, run the following commands:' . PHP_EOL .
+        'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
+        'php composer.phar install' . PHP_EOL
+    );
+}
+
+$loader = require $filename;
+
+$filename = '.env';
+if (file_exists($filename)) {
+    $dotenv = new Dotenv();
+    $dotenv->load($filename);
+}
+
+
+$application = new Application('Exo CLI', '1.0.0');
+$application->setCatchExceptions(true);
+$application->add(new \Exo\Console\Command\ServiceCommand());
+$application->add(new \Exo\Console\Command\RunCommand());
+$application->run();

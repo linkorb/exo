@@ -1,0 +1,21 @@
+{
+  "name": "hello-bash",
+  "description": "My cool Hello world example in Bash",
+  "handler": "handler.sh",
+  "interpreter": "bash",
+  "config": {
+    "schema": {
+      "$ref": "../schema/config.schema.json"
+    }
+  },
+  "input": {
+    "schema": {
+      "$ref": "../schema/input.schema.json"
+    }
+  },
+  "output": {
+    "schema": {
+      "$ref": "../schema/output.schema.json"
+    }
+  }
+}
