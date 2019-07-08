@@ -9,7 +9,7 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class Utils
 {
-    public static function run(string $actionFilename, callable $callable)
+    public static function run(callable $callable)
     {
         $filename = '.env'; // current working directory
         if (file_exists($filename)) {
@@ -17,23 +17,29 @@ class Utils
             $dotenv->load($filename);
         }
 
-        $actionLoader = new ActionLoader();
-        $action = $actionLoader->load($actionFilename);
-
         $stdin = file_get_contents("php://stdin");
-        $input = json_decode($stdin, true);
+        $request = json_decode($stdin, true);
 
-        $action->validateConfig();
-        $action->validateInput($input);
+        $response = $callable($request);
 
-        $output = $callable($input);
-        $action->validateOutput($output);
-
-        echo self::toJson($output);
+        echo self::toJson($response);
     }
 
     public static function toJson(array $data)
     {
-        return json_encode($data, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
+        return json_encode($data, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) . PHP_EOL;
+    }
+
+    public static function validateArray(array &$data, array $schema): void
+    {
+        $validator = new Validator();
+
+        $obj = json_decode(json_encode($data));
+
+        $validator->validate(
+            $obj,
+            $schema,
+            Constraint::CHECK_MODE_COERCE_TYPES|Constraint::CHECK_MODE_APPLY_DEFAULTS|Constraint::CHECK_MODE_EXCEPTIONS
+        );
     }
 }

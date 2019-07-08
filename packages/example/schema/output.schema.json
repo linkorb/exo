@@ -1,6 +1,7 @@
 {
   "type": "object",
   "required": [ "text" ],
+  "additionalProperties": false,
   "properties": {
     "text": {
       "type": "string"

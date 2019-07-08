@@ -1,0 +1,12 @@
+{
+  "name": "hello-bash",
+  "description": "My cool Hello world example in Bash",
+  "handler": "hello-bash/handler.sh",
+  "interpreter": "bash",
+  "input": {
+    "$import": "../schema/input.schema.json"
+  },
+  "output": {
+    "$import": "../schema/output.schema.json"
+  }
+}

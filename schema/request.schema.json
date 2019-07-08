@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "required": [ "action", "config", "input" ],
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "Full Qualified Action name"
+    },
+    "config": {
+      "type": "object",
+      "description": "Config variables"
+    },
+    "input": {
+      "type": "object",
+      "description": "Input variables"
+    }
+  }
+}

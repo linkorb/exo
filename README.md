@@ -5,23 +5,24 @@ Inspired by the trends in Serverless / FaaS / Cloud Functions.
 
 ## Features:
 
-* Provides a framework to build, call and test reusable stateless functions (actions).
+* Provides a framework to build, call and test reusable, stateless, language agnostic functions (actions).
 * A language agnostic (json) format to define `inputs`, `outputs` and `configs` that your actions need.
-* A service.json format to list the Exo Actions you'd like to expose.
-* Uses JSON Schema to validate all input, output and configs.
-* Invokers for your Exo Action, so you can easily call/host them locally or remotely.
-* Supports functions implemented in PHP or any other language, including executing external commands.
+* "Exo Actions" are bundled into reusable "Exo Packages"
+* Configure your Exo instance with a `exo.config.json` file, importing all the packages your app needs.
+* Uses JSON Schema to validate every request, response, input, output and config.
 * An HTTP end-point server to serve your functions.
 * A Console tool to help build, test and debug your Exo functions.
 
 ## Examples:
 
-The `example/` directory contains an example service with 2 functions, one implemented in PHP, and one generically executing an external CLI tool.
+The `example/` directory contains an example package with 2 functions, one implemented in PHP, and one generically executing an external CLI tool.
 
 To test it out:
 
-    cd example/
-    ../bin/exo run example/hello-php/exo.action.json < example/input.example.json
+    cp .env.dist .env
+    edit .env # setup your EXO_CONFIG path
+    bin/exo action example/hello-php -i greeting=Hello -i name=Alice
+    bin/exo run example/hello-php -i greeting=Hello -i name=Alice
 
 This will call the `hello-php` Action, passing input arguments through stdin.
 

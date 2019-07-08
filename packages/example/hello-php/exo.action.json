@@ -1,0 +1,12 @@
+{
+  "name": "hello-php",
+  "description": "My cool Hello world example in PHP",
+  "handler": "handler.php",
+  "interpreter": "php",
+  "input": {
+    "$import": "../schema/input.schema.json"
+  },
+  "output": {
+    "$import": "../schema/output.schema.json"
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "name": "example",
-  "description": "Various example actions to return friendly greetings",
-  "actions": [
-    "hello-php/exo.action.json",
-    "hello-node/exo.action.json",
-    "hello-bash/exo.action.json"
-  ]
-}

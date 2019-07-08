@@ -1,11 +1,13 @@
 {
   "type": "object",
   "required": [ "greeting", "name" ],
+  "additionalProperties": false,
   "properties": {
     "greeting": {
       "type": "string",
       "description": "Type of greeting",
-      "default": "Hello"
+      "default": "Hello",
+      "enum": [ "Hello", "What's up", "Yo" ]
     },
     "name": {
       "type": "string",

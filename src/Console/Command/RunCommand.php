@@ -6,15 +6,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Exo\Loader\ActionLoader;
-use Exo\JsonFileLoader;
-
 use RuntimeException;
 
-class RunCommand extends Command
+class RunCommand extends AbstractCommand
 {
     /**
      * {@inheritdoc}
@@ -25,16 +19,17 @@ class RunCommand extends Command
 
         $this
             ->setName('run')
-            ->setDescription('Run func')
+            ->setDescription('Run an action')
             ->addArgument(
-                'filename',
+                'fqan',
                 InputArgument::REQUIRED,
-                'exo.action.json filename'
+                'Fully Qualified Action Name'
             )
-            ->addArgument(
-                'inputFilename',
-                InputArgument::OPTIONAL,
-                'Input filename'
+            ->addOption(
+                'input',
+                'i',
+                InputOption::VALUE_IS_ARRAY|InputOption::VALUE_REQUIRED,
+                'Pass key=value as input'
             )
         ;
     }
@@ -44,43 +39,52 @@ class RunCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filename = $input->getArgument('filename');
-        $inputFilename = $input->getArgument('inputFilename');
+        $fqan = $input->getArgument('fqan');
+        $exo = $this->getExo();
 
-        $actionLoader = new ActionLoader();
-        $action = $actionLoader->load($filename);
+        $inputArray = [];
 
-        if (!$inputFilename) {
-            $inputFilename = "php://stdin";
-        } else {
-            if (!file_exists($inputFilename)) {
-                throw new RuntimeException("Input filename not found: " . $inputFilename);
+        foreach ($input->getOption('input') as $pair) {
+            $part = explode("=", $pair);
+            if (count($part)!=2) {
+                throw new RuntimeException("Invalid input key/value pair: " . $pair . " (use key=value format)");
             }
+            $inputArray[$part[0]] = (string)$part[1];
         }
 
-        $stdin = file_get_contents($inputFilename);
-        $input = json_decode($stdin, true);
+        $action = $exo->getAction($fqan);
+        $package = $action->getPackage();
+        $config = $exo->getPackageConfig($package->getName());
 
-        $action->validateConfig();
-        $action->validateInput($input);
-
-        $handlerFilename = $action->getHandlerFilename();
-        $interpreter = $action->getInterpreter();
-        $cwd = getcwd();
-        $env = $_ENV;
-        $process = new Process(array($interpreter, $handlerFilename), $cwd, $env, $stdin);
-        $process->run();
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
+        $request = [
+            'action' => $fqan,
+            'config' => $config,
+            'input' => $inputArray,
+        ];
+    
+        if ($output->isVerbose()) {
+            $output->writeLn("<info>Request:</info>");
+            $output->writeLn(json_encode($request, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+            $output->writeLn("");
         }
 
-        $res = $process->getOutput();
+        $response = $exo->handle($request);
 
-        $output->writeLn($res);
+        if ($output->isVerbose()) {
+            $output->writeLn("<info>Response:</info>");
+            $output->writeLn(json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+            $output->writeLn("");
+        }
+        
+        $output->writeLn('<info>Status:</info> ' . $response['status']);
+        $output->writeLn('<info>Output:</info>');
+        foreach ($response['output'] as $k=>$v) {
+            if (!is_string($v)) {
+                $v = json_encode($v, JSON_UNESCAPED_SLASHES);
+            }
+            $output->writeLn("  * <comment>{$k}</comment>: {$v}");
+        } 
 
-        $outputData = json_decode($res, true);
-
-        $action->validateOutput($outputData);
 
         // print_r($func);
     }

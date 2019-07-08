@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "required": [ "rows" ],
+    "additionalProperties": false,
+    "properties": {
+      "rows": {
+        "type": "array",
+        "description": "Result rows"
+      }
+    }
+  }
+  

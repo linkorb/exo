@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "required": [ "sql" ],
+    "additionalProperties": false,
+    "properties": {
+      "sql": {
+        "type": "string",
+        "description": "SQL query"
+      }
+    }
+  }
+  
