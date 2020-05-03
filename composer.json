@@ -17,7 +17,15 @@
     "symfony/yaml": "^3.0|^4.0",
     "linkorb/boost": "^1.0",
     "linkorb/collection": "^1.0",
-    "symfony/process": "^3.0|^4.0"
+    "symfony/process": "^3.0|^4.0",
+    "symfony/http-client": "^4.3",
+    "psr/http-client": "^1.0",
+    "nyholm/psr7": "^1.1",
+    "symfony/mailer": "^5.0",
+    "symfony/mime": "^5.0",
+    "gnello/php-mattermost-driver": "^2.12",
+    "thibaud-dauce/mattermost-php": "^1.2",
+    "linkorb/config": "^1.0"
   },
   "require-dev": {
     "symfony/dotenv": "^3.0|^4.0",

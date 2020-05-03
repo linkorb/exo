@@ -1,6 +1,6 @@
 {
     "type": "object",
-    "required": [ "status", "output" ],
+    "required": [ "status" ],
     "additionalProperties": false,
     "properties": {
       "status": {
@@ -8,12 +8,16 @@
         "description": "Status",
         "enum": [ "OK", "ERROR" ]
       },
-      "debug": {
-        "type": "array",
-        "description": "Debug records"
+      "request": {
+        "type": ["object"],
+        "description": "Original request info"
+      },
+      "error": {
+        "type": ["object", "array"],
+        "description": "Error records"
       },
       "output": {
-        "type": "object",
+        "type": ["object", "array"],
         "description": "Output variables"
       }
     }

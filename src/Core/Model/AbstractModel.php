@@ -1,6 +1,6 @@
 <?php
 
-namespace Exo\Model;
+namespace Exo\Core\Model;
 
 
 use Boost\BoostTrait;

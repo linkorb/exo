@@ -1,30 +1,12 @@
 <?php
 
-namespace Exo;
+namespace Exo\Core\Utils;
 
-use Exo\Loader\ActionLoader;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
-use Symfony\Component\Dotenv\Dotenv;
 
-class Utils
+class JsonUtils
 {
-    public static function run(callable $callable)
-    {
-        $filename = '.env'; // current working directory
-        if (file_exists($filename)) {
-            $dotenv = new Dotenv();
-            $dotenv->load($filename);
-        }
-
-        $stdin = file_get_contents("php://stdin");
-        $request = json_decode($stdin, true);
-
-        $response = $callable($request);
-
-        echo self::toJson($response);
-    }
-
     public static function toJson(array $data)
     {
         return json_encode($data, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) . PHP_EOL;
@@ -35,6 +17,10 @@ class Utils
         $validator = new Validator();
 
         $obj = json_decode(json_encode($data));
+        if (is_array($obj)) {
+            // this happens when converting empty json arrays
+            $obj = new \stdClass();
+        }
 
         $validator->validate(
             $obj,

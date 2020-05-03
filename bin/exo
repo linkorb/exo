@@ -28,8 +28,9 @@ if (file_exists($filename)) {
 
 
 $application = new Application('Exo CLI', '1.0.0');
-$application->setCatchExceptions(true);
-$application->add(new \Exo\Console\Command\ConfigCommand());
+$application->setCatchExceptions(false);
 $application->add(new \Exo\Console\Command\ActionCommand());
 $application->add(new \Exo\Console\Command\RunCommand());
+$application->add(new \Exo\Console\Command\RequestCommand());
+$application->add(new \Exo\Console\Command\WorkerCommand());
 $application->run();

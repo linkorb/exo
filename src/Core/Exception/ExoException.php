@@ -1,6 +1,6 @@
 <?php
 
-namespace Exo\Exception;
+namespace Exo\Core\Exception;
 
 use RuntimeException;
 

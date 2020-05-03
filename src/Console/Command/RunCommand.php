@@ -39,9 +39,7 @@ class RunCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $fqan = $input->getArgument('fqan');
         $exo = $this->getExo();
-
         $inputArray = [];
 
         foreach ($input->getOption('input') as $pair) {
@@ -52,40 +50,15 @@ class RunCommand extends AbstractCommand
             $inputArray[$part[0]] = (string)$part[1];
         }
 
-        $action = $exo->getAction($fqan);
-        $package = $action->getPackage();
-        $config = $exo->getPackageConfig($package->getName());
-
+        $fqan = $input->getArgument('fqan');
         $request = [
             'action' => $fqan,
-            'config' => $config,
             'input' => $inputArray,
         ];
     
-        if ($output->isVerbose()) {
-            $output->writeLn("<info>Request:</info>");
-            $output->writeLn(json_encode($request, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
-            $output->writeLn("");
-        }
 
+        $action = $exo->getAction($fqan);
         $response = $exo->handle($request);
-
-        if ($output->isVerbose()) {
-            $output->writeLn("<info>Response:</info>");
-            $output->writeLn(json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
-            $output->writeLn("");
-        }
-        
-        $output->writeLn('<info>Status:</info> ' . $response['status']);
-        $output->writeLn('<info>Output:</info>');
-        foreach ($response['output'] as $k=>$v) {
-            if (!is_string($v)) {
-                $v = json_encode($v, JSON_UNESCAPED_SLASHES);
-            }
-            $output->writeLn("  * <comment>{$k}</comment>: {$v}");
-        } 
-
-
-        // print_r($func);
+        $output->writeLn(json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
     }
 }

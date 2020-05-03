@@ -1,9 +1,9 @@
 <?php
 
-namespace Exo\Model;
+namespace Exo\Core\Model;
 
 use Collection\Identifiable;
-use Exo\Utils;
+use Exo\Core\Utils\JsonUtils;
 
 class Action extends AbstractModel implements Identifiable
 {
@@ -25,7 +25,7 @@ class Action extends AbstractModel implements Identifiable
         if (!$this->getInputSchema()) {
             return true;
         }
-        Utils::validateArray($input, $this->getInputSchema());
+        JsonUtils::validateArray($input, $this->getInputSchema());
     }
 
     public function validateOutput(array $output)
@@ -33,6 +33,6 @@ class Action extends AbstractModel implements Identifiable
         if (!$this->getOutputSchema()) {
             return true;
         }
-        Utils::validateArray($output, $this->getOutputSchema());
+        JsonUtils::validateArray($output, $this->getOutputSchema());
     }
 }

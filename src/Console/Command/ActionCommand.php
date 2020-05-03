@@ -38,10 +38,8 @@ class ActionCommand extends AbstractCommand
         $fqan = $input->getArgument('fqan');
         if (!$fqan) {
             $output->writeLn('Actions:');
-            foreach ($exo->getPackages() as $package) {
-                foreach ($package->getActions() as $action) {
-                    $output->writeLn("  <info>" . $package->getName() . '/' . $action->getName() . '</info> ' . $action->getDescription());
-                }
+            foreach ($exo->getActions() as $action) {
+                $output->writeLn("  <info>" . $action->getName() . '</info> ' . $action->getDescription());
             }
             return;
         }
@@ -52,11 +50,11 @@ class ActionCommand extends AbstractCommand
         $output->writeLn("<comment>{$action->getDescription()}</comment>");
         // print_r($action->getInputSchema());
 
-        $output->writeLn('');
-        $output->writeLn("Config:");
-        foreach ($action->getConfigSchema()['properties'] as $name=>$data) {
-            $output->writeLn("  <info>EXO__EXAMPLE__{$name}</info>: " . ($data['description'] ?? null));
-        }
+        // $output->writeLn('');
+        // $output->writeLn("Config:");
+        // foreach ($action->getPackage()->getConfigSchema()['properties'] as $name=>$data) {
+        //     $output->writeLn("  <info>EXO__EXAMPLE__{$name}</info>: " . ($data['description'] ?? null));
+        // }
 
         $output->writeLn('');
         $output->writeLn("Inputs:");
@@ -65,11 +63,12 @@ class ActionCommand extends AbstractCommand
     
         }
         
-        $output->writeLn('');
-        $output->writeLn("Outputs:");
-        foreach ($action->getOutputSchema()['properties'] as $name=>$data) {
-            $output->writeLn("  <info>{$name}</info>: " . ($data['description'] ?? null));
-    
+        if ($action->getOutputSchema()) {
+            $output->writeLn('');
+            $output->writeLn("Outputs:");
+            foreach ($action->getOutputSchema()['properties'] as $name=>$data) {
+                $output->writeLn("  <info>{$name}</info>: " . ($data['description'] ?? null));
+            }
         }
         $output->writeLn('');
 

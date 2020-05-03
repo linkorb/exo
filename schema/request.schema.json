@@ -1,19 +1,23 @@
 {
   "type": "object",
-  "required": [ "action", "config", "input" ],
+  "required": [ "action", "input" ],
   "additionalProperties": false,
   "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique request identifier"
+    },
     "action": {
       "type": "string",
       "description": "Full Qualified Action name"
     },
-    "config": {
-      "type": "object",
-      "description": "Config variables"
-    },
     "input": {
-      "type": "object",
+      "type": ["object", "array"],
       "description": "Input variables"
+    },
+    "mapping": {
+      "type": ["object", "array"],
+      "description": "Output variable mappings"
     }
   }
 }
