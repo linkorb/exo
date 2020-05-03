@@ -32,6 +32,9 @@
     "symfony/dotenv": "^3.0|^4.0",
     "symfony/console": "^4.0"
   },
+  "scripts": {
+    "build": "echo 'noop'"
+  },
   "autoload": {
     "psr-4": {
         "Exo\\": "src/"
