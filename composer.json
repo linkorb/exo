@@ -25,7 +25,8 @@
     "symfony/mime": "^5.0",
     "gnello/php-mattermost-driver": "^2.12",
     "thibaud-dauce/mattermost-php": "^1.2",
-    "linkorb/config": "^1.0"
+    "linkorb/config": "^1.0",
+    "andrewfenn/pid-helper": "^0.1.0"
   },
   "require-dev": {
     "symfony/dotenv": "^3.0|^4.0",

@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use RuntimeException;
 use Exo\Core\Utils\ArrayUtils;
+use PidHelper\PidHelper;
 
 class WorkerCommand extends AbstractCommand
 {
@@ -29,6 +30,13 @@ class WorkerCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lock = new PidHelper('/run/user/' . posix_getuid() . '/', 'exo-worker.pid');
+        if (!$lock->lock()) {
+            $output->writeln('<error>Other worker process running, quiting.</error>');
+
+            return;
+        }
+
         $exo = $this->getExo();
 
         $workerName = 'camunda';
@@ -39,9 +47,14 @@ class WorkerCommand extends AbstractCommand
         $className = 'Exo\\Worker\\' . $options['TYPE'] . 'Worker';
         $adapter = new $className($exo, $options);
 
+        $startAt = time();
+        $maxRuntime = 60*30; // seconds
+        $executionCount  = 0;
+        $maxExecutionCount = 100;
+
         $running = true;
         while ($running) {
-            echo "Running" . PHP_EOL;
+            echo "Running [executions: $executionCount]" . PHP_EOL;
             $request = $adapter->popRequest();
             if ($request) {
                 
@@ -51,9 +64,18 @@ class WorkerCommand extends AbstractCommand
                 $response = $exo->handle($request);
                 echo (json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) . PHP_EOL);
                 $adapter->pushResponse($response);
+                $executionCount++;
             } else {
                 sleep(3);
             }
+
+            if (time() > ($startAt + $maxRuntime)) {
+                $running = false;
+            }
+            if ($executionCount>= $maxExecutionCount) {
+                $running = false;
+            }
         }
+        $lock->unlock();
     }
 }

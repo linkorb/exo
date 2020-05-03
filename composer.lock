@@ -4,8 +4,48 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bb0fa3118020a3201fafeb8d5eb0163e",
+    "content-hash": "62b7e3ffbd1b818b9eb2298ba03b7c11",
     "packages": [
+        {
+            "name": "andrewfenn/pid-helper",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andrewfenn/pidhelper.git",
+                "reference": "407e3b4e0210929a95adf2262c6c3cd38c2dd5e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andrewfenn/pidhelper/zipball/407e3b4e0210929a95adf2262c6c3cd38c2dd5e4",
+                "reference": "407e3b4e0210929a95adf2262c6c3cd38c2dd5e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PidHelper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrew Fenn",
+                    "homepage": "https://github.com/andrewfenn"
+                }
+            ],
+            "description": "A small helper class used to help you check if code is still running",
+            "keywords": [
+                "pid",
+                "process"
+            ],
+            "time": "2015-09-01T07:42:02+00:00"
+        },
         {
             "name": "doctrine/lexer",
             "version": "1.2.0",
