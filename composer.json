@@ -40,5 +40,8 @@
         "Exo\\": "src/"
     }
   },
+  "bin": [
+    "bin/exo"
+  ],
   "license": "MIT"
 }
