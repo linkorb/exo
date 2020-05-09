@@ -22,7 +22,7 @@ $loader = require $filename;
 
 $filename = '.env';
 if (file_exists($filename)) {
-    $dotenv = new Dotenv();
+    $dotenv = new Dotenv(true);
     $dotenv->load($filename);
 }
 
