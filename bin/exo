@@ -20,12 +20,11 @@ if (!file_exists($filename)) {
 
 $loader = require $filename;
 
-$filename = '.env';
+$filename = getcwd() . '/.env';
 if (file_exists($filename)) {
     $dotenv = new Dotenv(true);
     $dotenv->load($filename);
 }
-
 
 $application = new Application('Exo CLI', '1.0.0');
 $application->setCatchExceptions(false);
