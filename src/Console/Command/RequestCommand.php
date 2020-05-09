@@ -45,5 +45,6 @@ class RequestCommand extends AbstractCommand
         $action = $exo->getAction($fqan);
         $response = $exo->handle($request);
         $output->writeLn(json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+        return 0; // TODO: check exitcode
     }
 }

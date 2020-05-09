@@ -37,11 +37,11 @@ class ActionCommand extends AbstractCommand
 
         $fqan = $input->getArgument('fqan');
         if (!$fqan) {
-            $output->writeLn('Actions:');
+            $output->writeLn('Actions: ' . count($exo->getActions()));
             foreach ($exo->getActions() as $action) {
                 $output->writeLn("  <info>" . $action->getName() . '</info> ' . $action->getDescription());
             }
-            return;
+            return 0;
         }
 
         $action = $exo->getAction($fqan);
@@ -60,7 +60,6 @@ class ActionCommand extends AbstractCommand
         $output->writeLn("Inputs:");
         foreach ($action->getInputSchema()['properties'] as $name=>$data) {
             $output->writeLn("  <info>{$name}</info>: " . ($data['description'] ?? null));
-    
         }
         
         if ($action->getOutputSchema()) {
@@ -71,6 +70,6 @@ class ActionCommand extends AbstractCommand
             }
         }
         $output->writeLn('');
-
+        return 0;
     }
 }
