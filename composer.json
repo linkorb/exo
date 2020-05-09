@@ -26,9 +26,7 @@
     "gnello/php-mattermost-driver": "^2.12",
     "thibaud-dauce/mattermost-php": "^1.2",
     "linkorb/config": "^1.0",
-    "andrewfenn/pid-helper": "^0.1.0"
-  },
-  "require-dev": {
+    "andrewfenn/pid-helper": "^0.1.0",
     "symfony/dotenv": "^3.0|^4.0",
     "symfony/console": "^4.0"
   },
