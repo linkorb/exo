@@ -1,36 +1,42 @@
-name: Build container for production
-
-on:
-  push:
-    branches:
-    - master
-  schedule:
-  - cron: 0 9 * * 2
-
+name: 'Build container for production'
+'on':
+    push:
+        branches:
+            - master
+    schedule:
+        -
+            cron: '0 9 * * 2'
 jobs:
-  build:
-    env:
-      REPO_NAME: ${{ github.event.repository.name }}
-      SHA8: $(echo ${GITHUB_SHA} | cut -c1-8)
-      DOCKER_TAG: docker.pkg.github.com/linkorb/${REPO_NAME}/${REPO_NAME}
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Docker login
-      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.pkg.github.com --username automation@linkorb.com --password-stdin
-    - name: Build the Docker image
-      run: docker build . --tag ${DOCKER_TAG}:latest --file Dockerfile.qa
-    - name: Docker push with latest tag
-      run: docker push ${DOCKER_TAG}:latest
-    - name: Docker retag new image with commit hash
-      run: docker image tag ${DOCKER_TAG}:latest ${DOCKER_TAG}:$(echo ${GITHUB_SHA} | cut -c1-8)
-    - name: Docker push with commit hash tag
-      run: docker push ${DOCKER_TAG}:$(echo ${GITHUB_SHA} | cut -c1-8)
-    - name: Deploy
-      run: curl "https://webhook.linkorb.com/1/github?image="${{ env.REPO_NAME }}"&tag="${{ env.SHA8 }}
-    - name: Deploy
-      run: curl "https://webhook.linkorb.com/2/github?image="${{ env.REPO_NAME }}"&tag="${{ env.SHA8 }}
-    - name: Deploy
-      run: curl "https://webhook.linkorb.com/3/github?image="${{ env.REPO_NAME }}"&tag="${{ env.SHA8 }}
+    build:
+        env:
+            REPO_NAME: '${{ github.event.repository.name }}'
+            SHA8: '$(echo ${GITHUB_SHA} | cut -c1-8)'
+            DOCKER_TAG: 'docker.pkg.github.com/linkorb/${REPO_NAME}/${REPO_NAME}'
+        runs-on: ubuntu-latest
+        steps:
+            -
+                uses: actions/checkout@v2
+            -
+                name: 'Docker login'
+                run: 'echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.pkg.github.com --username automation@linkorb.com --password-stdin'
+            -
+                name: 'Build the Docker image'
+                run: 'docker build . --tag ${DOCKER_TAG}:latest --file Dockerfile.qa'
+            -
+                name: 'Docker push with latest tag'
+                run: 'docker push ${DOCKER_TAG}:latest'
+            -
+                name: 'Docker retag new image with commit hash'
+                run: 'docker image tag ${DOCKER_TAG}:latest ${DOCKER_TAG}:$(echo ${GITHUB_SHA} | cut -c1-8)'
+            -
+                name: 'Docker push with commit hash tag'
+                run: 'docker push ${DOCKER_TAG}:$(echo ${GITHUB_SHA} | cut -c1-8)'
+            -
+                name: Deploy
+                run: 'curl "https://webhook.linkorb.com/1/github?image="${{ env.REPO_NAME }}"&tag="${{ env.SHA8 }}'
+            -
+                name: Deploy
+                run: 'curl "https://webhook.linkorb.com/2/github?image="${{ env.REPO_NAME }}"&tag="${{ env.SHA8 }}'
+            -
+                name: Deploy
+                run: 'curl "https://webhook.linkorb.com/3/github?image="${{ env.REPO_NAME }}"&tag="${{ env.SHA8 }}'
