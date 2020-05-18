@@ -1,0 +1,17 @@
+name: Cleanup Staging when PR closed
+
+on:
+  pull_request:
+    types: [closed, dismissed]
+
+jobs:
+  build:
+    env:
+      NAME: ${{ github.event.repository.name }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Cleanup
+      if: github.event.pull_request.merged == 1
+      run: curl "https://webhook.linkorb.com/staging-delete/delete?name=${NAME}&tag=pr-$(jq --raw-output .pull_request.number $GITHUB_EVENT_PATH)&image=${NAME}/{$NAME}"

@@ -1,6 +1,9 @@
 {
   "type": "object",
-  "required": [ "action", "input" ],
+  "required": [
+    "action",
+    "input"
+  ],
   "additionalProperties": false,
   "properties": {
     "id": {
@@ -12,11 +15,17 @@
       "description": "Full Qualified Action name"
     },
     "input": {
-      "type": ["object", "array"],
+      "type": [
+        "object",
+        "array"
+      ],
       "description": "Input variables"
     },
     "mapping": {
-      "type": ["object", "array"],
+      "type": [
+        "object",
+        "array"
+      ],
       "description": "Output variable mappings"
     }
   }

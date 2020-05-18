@@ -1,24 +1,37 @@
 {
-    "type": "object",
-    "required": [ "status" ],
-    "additionalProperties": false,
-    "properties": {
-      "status": {
-        "type": "string",
-        "description": "Status",
-        "enum": [ "OK", "ERROR" ]
-      },
-      "request": {
-        "type": ["object"],
-        "description": "Original request info"
-      },
-      "error": {
-        "type": ["object", "array"],
-        "description": "Error records"
-      },
-      "output": {
-        "type": ["object", "array"],
-        "description": "Output variables"
-      }
+  "type": "object",
+  "required": [
+    "status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Status",
+      "enum": [
+        "OK",
+        "ERROR"
+      ]
+    },
+    "request": {
+      "type": [
+        "object"
+      ],
+      "description": "Original request info"
+    },
+    "error": {
+      "type": [
+        "object",
+        "array"
+      ],
+      "description": "Error records"
+    },
+    "output": {
+      "type": [
+        "object",
+        "array"
+      ],
+      "description": "Output variables"
     }
   }
+}

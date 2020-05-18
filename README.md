@@ -182,3 +182,7 @@ MIT. Please refer to the [license file](LICENSE) for details.
 Check out our other projects at [linkorb.com/engineering](http://www.linkorb.com/engineering).
 
 Btw, we're hiring!
+
+## Git hooks
+
+There are some git hooks under `.hooks` directory. Feel free to copy & adjust & use them
