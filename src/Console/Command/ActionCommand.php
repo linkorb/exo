@@ -24,8 +24,7 @@ class ActionCommand extends AbstractCommand
                 'fqan',
                 InputArgument::OPTIONAL,
                 'Fully Qualified Action Name'
-            )
-        ;
+            );
     }
 
     /**
@@ -58,14 +57,14 @@ class ActionCommand extends AbstractCommand
 
         $output->writeLn('');
         $output->writeLn("Inputs:");
-        foreach ($action->getInputSchema()['properties'] as $name=>$data) {
+        foreach ($action->getInputSchema()['properties'] as $name => $data) {
             $output->writeLn("  <info>{$name}</info>: " . ($data['description'] ?? null));
         }
         
         if ($action->getOutputSchema()) {
             $output->writeLn('');
             $output->writeLn("Outputs:");
-            foreach ($action->getOutputSchema()['properties'] as $name=>$data) {
+            foreach ($action->getOutputSchema()['properties'] as $name => $data) {
                 $output->writeLn("  <info>{$name}</info>: " . ($data['description'] ?? null));
             }
         }

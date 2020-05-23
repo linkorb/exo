@@ -21,8 +21,7 @@ class WorkerCommand extends AbstractCommand
 
         $this
             ->setName('worker')
-            ->setDescription('Run worker')
-        ;
+            ->setDescription('Run worker');
     }
 
     /**
@@ -34,7 +33,7 @@ class WorkerCommand extends AbstractCommand
         if (!$lock->lock()) {
             $output->writeln('<error>Other worker process running, quiting.</error>');
 
-            return;
+            return -1;
         }
 
         $exo = $this->getExo();
@@ -48,7 +47,7 @@ class WorkerCommand extends AbstractCommand
         $adapter = new $className($exo, $options);
 
         $startAt = time();
-        $maxRuntime = 60*30; // seconds
+        $maxRuntime = 60 * 30; // seconds
         $executionCount  = 0;
         $maxExecutionCount = 100;
 
@@ -57,12 +56,11 @@ class WorkerCommand extends AbstractCommand
             echo "Running [executions: $executionCount]" . PHP_EOL;
             $request = $adapter->popRequest();
             if ($request) {
-                
                 $actionName = $request['action'] ?? null;
                 $action = $exo->getAction($actionName);
                 $package = $action->getPackage();
                 $response = $exo->handle($request);
-                echo (json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) . PHP_EOL);
+                echo (json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
                 $adapter->pushResponse($response);
                 $executionCount++;
             } else {
@@ -72,10 +70,12 @@ class WorkerCommand extends AbstractCommand
             if (time() > ($startAt + $maxRuntime)) {
                 $running = false;
             }
-            if ($executionCount>= $maxExecutionCount) {
+            if ($executionCount >= $maxExecutionCount) {
                 $running = false;
             }
         }
         $lock->unlock();
+
+        return 0;
     }
 }
