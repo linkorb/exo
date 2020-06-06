@@ -12,6 +12,9 @@ use JsonSchema\Constraints\Constraint;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
+/**
+ * @method Action[]|TypedArray getActions()
+ */
 class Exo extends AbstractModel
 {
     protected $name;
@@ -19,6 +22,8 @@ class Exo extends AbstractModel
     // protected $packages = [];
     protected $actions = [];
     protected $variables = [];
+    protected $requestSchema;
+    protected $responseSchema;
 
     public function __construct()
     {
@@ -39,7 +44,7 @@ class Exo extends AbstractModel
 
     public function getAction(string $fqan): Action
     {
-        
+
         if (!$this->getActions()->hasKey($fqan)) {
             throw new Exception\UnknownActionException("Unknown action: " . $fqan);
         }
@@ -73,11 +78,11 @@ class Exo extends AbstractModel
 
 
 
-        foreach ($request['input'] as $k=>$v) {
+        foreach ($request['input'] as $k => $v) {
             if (is_string($v)) {
-                foreach ($this->variables as $k2=>$v2) {
+                foreach ($this->variables as $k2 => $v2) {
                     $varName = '{{' . trim($k2) . '}}';
-                    if (strpos($v, $varName)!== false) {
+                    if (strpos($v, $varName) !== false) {
                         $v3 = str_replace($varName, $v2, $v);
                         // echo "$k=$v - $k2=$v2 ($v3)\n";
                         $request['input'][$k] = $v3;
@@ -85,7 +90,7 @@ class Exo extends AbstractModel
                 }
             }
         }
-// print_r($request);exit('DONE'. PHP_EOL);
+        // print_r($request);exit('DONE'. PHP_EOL);
         $action->validateInput($request['input']);
 
         $handlerFilename = $action->getHandler();
@@ -99,7 +104,7 @@ class Exo extends AbstractModel
         //     $k = $envPrefix . strtoupper($k);
         //     $env[$k] = $v;
         // }
-        $stdin = json_encode($request, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        $stdin = json_encode($request, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $process = new Process(array($interpreter, $handlerFilename), $cwd, $env, $stdin);
         $process->run();
         if (!$process->isSuccessful()) {
@@ -123,7 +128,7 @@ class Exo extends AbstractModel
         $action->validateOutput($output);
 
         // Apply output variable mapping
-        foreach(($request['mapping'] ?? []) as $name=>$mapping) {
+        foreach (($request['mapping'] ?? []) as $name => $mapping) {
             if (isset($response['output'][$name])) {
                 $value = $response['output'][$name];
                 $response['output'][$mapping] = $value;

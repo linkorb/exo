@@ -13,7 +13,7 @@ class ActionLoader
         if (!isset($config['handler'])) {
             throw new Exception\ConfigurationException("Undefined handler for action '$actionName'");
         }
-        
+
         $handler = $path . '/' . $config['handler'];
         if (!file_exists($handler)) {
             throw new Exception\ConfigurationException("Handler not found for action '$actionName' " . $handler);
@@ -33,10 +33,12 @@ class ActionLoader
                     $interpreter = 'sh';
                     break;
                 default:
-                    throw new Exception\ConfigurationException("Can't determine interpreter for action '$fqan'. Please specify.");
+                    throw new Exception\ConfigurationException(
+                        "Can't determine interpreter for action '$actionName'. Please specify."
+                    );
             }
         }
-        
+
         $action = new Action();
         $action->setName($config['name'] ?? null);
         $action->setDescription($config['description'] ?? null);

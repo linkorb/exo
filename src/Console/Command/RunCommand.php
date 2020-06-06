@@ -28,10 +28,9 @@ class RunCommand extends AbstractCommand
             ->addOption(
                 'input',
                 'i',
-                InputOption::VALUE_IS_ARRAY|InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Pass key=value as input'
-            )
-        ;
+            );
     }
 
     /**
@@ -44,7 +43,7 @@ class RunCommand extends AbstractCommand
 
         foreach ($input->getOption('input') as $pair) {
             $part = explode("=", $pair);
-            if (count($part)!=2) {
+            if (count($part) != 2) {
                 throw new RuntimeException("Invalid input key/value pair: " . $pair . " (use key=value format)");
             }
             $inputArray[$part[0]] = (string)$part[1];
@@ -58,7 +57,7 @@ class RunCommand extends AbstractCommand
     
         $action = $exo->getAction($fqan);
         $response = $exo->handle($request);
-        $output->writeLn(json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+        $output->writeLn(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         return 0; // TODO: check response errors!
     }
 }

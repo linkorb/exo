@@ -3,3 +3,5 @@ vendor/
 .env
 autotune.json
 exo.config.yaml
+.phpcs-cache
+node_modules

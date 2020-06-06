@@ -19,8 +19,7 @@ class RequestCommand extends AbstractCommand
 
         $this
             ->setName('request')
-            ->setDescription('Handle a request')
-        ;
+            ->setDescription('Handle a request');
     }
 
     /**
@@ -33,7 +32,7 @@ class RequestCommand extends AbstractCommand
 
         
         $stdin = file_get_contents("php://stdin");
-        $request = json_decode($stdin, true);   
+        $request = json_decode($stdin, true);
         if (!$request) {
             throw new RuntimeException("Can't parse request JSON");
         }
@@ -44,7 +43,7 @@ class RequestCommand extends AbstractCommand
         
         $action = $exo->getAction($fqan);
         $response = $exo->handle($request);
-        $output->writeLn(json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+        $output->writeLn(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         return 0; // TODO: check exitcode
     }
 }

@@ -1,45 +1,75 @@
 {
-  "name": "linkorb/exo",
-  "description": "Exo Integration Engine: FaaS, Actions, Triggers",
-  "homepage": "http://www.github.com/linkorb/exo",
-  "keywords": ["func", "action", "trigger", "faas", "exo", "linkorb"],
-  "type": "library",
-  "authors": [
-    {
-      "name": "Joost Faassen",
-      "email": "j.faassen@linkorb.com",
-      "role": "Development"
+    "name": "linkorb/exo",
+    "description": "Exo Integration Engine: FaaS, Actions, Triggers",
+    "homepage": "http://www.github.com/linkorb/exo",
+    "keywords": [
+        "func",
+        "action",
+        "trigger",
+        "faas",
+        "exo",
+        "linkorb"
+    ],
+    "type": "library",
+    "authors": [
+        {
+            "name": "Joost Faassen",
+            "email": "j.faassen@linkorb.com",
+            "role": "Development"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "justinrainbow/json-schema": "^5.0",
+        "symfony/yaml": "^3.0|^4.0|^5.0",
+        "linkorb/boost": "^1.0",
+        "linkorb/collection": "^1.0",
+        "symfony/process": "^3.0|^4.0|^5.0",
+        "symfony/http-client": "^4.3|^5.0",
+        "psr/http-client": "^1.0",
+        "nyholm/psr7": "^1.1",
+        "symfony/mailer": "^5.0",
+        "symfony/mime": "^5.0",
+        "gnello/php-mattermost-driver": "^2.12",
+        "thibaud-dauce/mattermost-php": "^1.2",
+        "linkorb/config": "^1.0",
+        "andrewfenn/pid-helper": "^0.1.0",
+        "symfony/dotenv": "^3.0|^4.0|^5.0",
+        "symfony/console": "^4.0|^5.0"
+    },
+    "scripts": {
+        "build": "echo 'noop'",
+        "qa-checks": [
+            "@phpstan",
+            "@phpcs",
+            "@phpcpd",
+            "@phpcf",
+            "@security-check"
+        ],
+        "phpstan": "./vendor/bin/phpstan analyze --level=5 ./src/",
+        "phpcs": "./vendor/bin/phpcs ./src/",
+        "phpcpd": "./vendor/bin/phpcpd --fuzzy ./src/",
+        "phpcf": "./vendor/bin/phpcf --target 7.1 ./src/",
+        "security-check": "./vendor/bin/security-checker security:check ./composer.lock"
+    },
+    "autoload": {
+        "psr-4": {
+            "Exo\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/exo"
+    ],
+    "license": "MIT",
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.25",
+        "phpstan/phpstan-symfony": "^0.12.6",
+        "squizlabs/php_codesniffer": "^3.5",
+        "sebastian/phpcpd": "^5.0",
+        "wapmorgan/php-code-fixer": "^2.0",
+        "sensiolabs/security-checker": "^6.0"
+    },
+    "replace": {
+        "vlucas/phpdotenv": "*"
     }
-  ],
-  "require": {
-    "php": ">=7.0",
-    "justinrainbow/json-schema": "^5.0",
-    "symfony/yaml": "^3.0|^4.0|^5.0",
-    "linkorb/boost": "^1.0",
-    "linkorb/collection": "^1.0",
-    "symfony/process": "^3.0|^4.0|^5.0",
-    "symfony/http-client": "^4.3|^5.0",
-    "psr/http-client": "^1.0",
-    "nyholm/psr7": "^1.1",
-    "symfony/mailer": "^5.0",
-    "symfony/mime": "^5.0",
-    "gnello/php-mattermost-driver": "^2.12",
-    "thibaud-dauce/mattermost-php": "^1.2",
-    "linkorb/config": "^1.0",
-    "andrewfenn/pid-helper": "^0.1.0",
-    "symfony/dotenv": "^3.0|^4.0|^5.0",
-    "symfony/console": "^4.0|^5.0"
-  },
-  "scripts": {
-    "build": "echo 'noop'"
-  },
-  "autoload": {
-    "psr-4": {
-        "Exo\\": "src/"
-    }
-  },
-  "bin": [
-    "bin/exo"
-  ],
-  "license": "MIT"
 }

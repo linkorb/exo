@@ -22,7 +22,6 @@ abstract class AbstractCommand extends Command
             foreach ($paths as $path) {
                 $filename = $path . '/exo.action.yaml';
                 if (file_exists($filename)) {
-
                     $actionConfig = $configLoader->loadFile($filename);
                     $action = $actionLoader->load(dirname($filename), $actionConfig);
 

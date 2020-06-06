@@ -9,7 +9,7 @@ class JsonUtils
 {
     public static function toJson(array $data)
     {
-        return json_encode($data, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) . PHP_EOL;
+        return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL;
     }
 
     public static function validateArray(array &$data, array $schema): void
@@ -25,7 +25,7 @@ class JsonUtils
         $validator->validate(
             $obj,
             $schema,
-            Constraint::CHECK_MODE_COERCE_TYPES|Constraint::CHECK_MODE_APPLY_DEFAULTS|Constraint::CHECK_MODE_EXCEPTIONS
+            Constraint::CHECK_MODE_COERCE_TYPES | Constraint::CHECK_MODE_APPLY_DEFAULTS | Constraint::CHECK_MODE_EXCEPTIONS
         );
     }
 }
