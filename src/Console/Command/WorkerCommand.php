@@ -77,5 +77,6 @@ class WorkerCommand extends AbstractCommand
             }
         }
         $lock->unlock();
+        return 0;
     }
 }
