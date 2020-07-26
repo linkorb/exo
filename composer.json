@@ -35,7 +35,8 @@
         "linkorb/config": "^1.0",
         "andrewfenn/pid-helper": "^0.1.0",
         "symfony/dotenv": "^3.0|^4.0|^5.0",
-        "symfony/console": "^4.0|^5.0"
+        "symfony/console": "^4.0|^5.0",
+        "symfony/property-access": "^5.1"
     },
     "scripts": {
         "build": "echo 'noop'",

@@ -11,6 +11,7 @@ use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @method Action[]|TypedArray getActions()
@@ -76,22 +77,40 @@ class Exo extends AbstractModel
 
         // $package->validateConfig($request['config']);
 
+        $input = $request['input'] ?? [];
 
 
-        foreach ($request['input'] as $k => $v) {
+        // Apply variables
+        foreach ($input as $k => $v) {
             if (is_string($v)) {
                 foreach ($this->variables as $k2 => $v2) {
                     $varName = '{{' . trim($k2) . '}}';
                     if (strpos($v, $varName) !== false) {
                         $v3 = str_replace($varName, $v2, $v);
                         // echo "$k=$v - $k2=$v2 ($v3)\n";
-                        $request['input'][$k] = $v3;
+                        $input[$k] = $v3;
                     }
                 }
             }
         }
+
+        // Un-flatten multi-dimensional array keys
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($input as $k=>$v) {
+            if (is_object($v)) {
+                $input[$k] = $v;
+            } else {
+                unset($input[$k]);
+                $k = str_replace('.', '][', $k);
+                $k = str_replace('__', '][', $k);
+                $propertyAccessor->setValue($input, '[' . $k . ']', $v);
+            }
+        }
+
+        // print_r($input); exit();
+        $action->validateInput($input);
+        $request['input'] = $input;
         // print_r($request);exit('DONE'. PHP_EOL);
-        $action->validateInput($request['input']);
 
         $handlerFilename = $action->getHandler();
         $interpreter = $action->getInterpreter();
