@@ -1,0 +1,9 @@
+metadata:
+  labels:
+    linkorb.com/description: "Exo: FaaS framework supporting externalized Actions and Triggers"
+    linkorb.com/maintenance: active
+    linkorb.com/code-owner: jfaassen
+    linkorb.com/license: MIT
+    linkorb.com/language: php
+    linkorb.com/framework: none
+    linkorb.com/app-type: cli
