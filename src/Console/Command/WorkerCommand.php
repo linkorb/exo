@@ -36,14 +36,14 @@ class WorkerCommand extends AbstractCommand
             return -1;
         }
 
-        $exo = $this->getExo();
+        $exo = $this->getExo($input, $output);
 
-        $workerName = 'camunda';
-
+        $workerType = getenv('EXO__WORKER__TYPE');
         $variables = getenv();
-        $options = ArrayUtils::getByPrefix($variables, 'EXO__WORKER__');
+        $options = ArrayUtils::getByPrefix($variables, 'EXO__WORKER__' . strtoupper($workerType) . '__');
 
-        $className = 'Exo\\Worker\\' . $options['TYPE'] . 'Worker';
+        $exo->getLogger()->info("Starting worker", ['workerType' => $workerType]);
+        $className = 'Exo\\Worker\\' . $workerType . 'Worker';
         $adapter = new $className($exo, $options);
 
         $startAt = time();
@@ -51,17 +51,15 @@ class WorkerCommand extends AbstractCommand
         $executionCount  = 0;
         $maxExecutionCount = 100;
 
+        $adapter->connect();
+
         $running = true;
         while ($running) {
-            echo "Running [executions: $executionCount]" . PHP_EOL;
+            $exo->getLogger()->debug("Running", ['executions' => $executionCount]);
             $request = $adapter->popRequest();
             if ($request) {
-                $actionName = $request['action'] ?? null;
-                $action = $exo->getAction($actionName);
-                $package = $action->getPackage();
-                $response = $exo->handle($request);
-                echo (json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
-                $adapter->pushResponse($response);
+                $response = $exo->safeHandle($request);
+                $adapter->pushResponse($request, $response);
                 $executionCount++;
             } else {
                 sleep(3);
@@ -75,6 +73,7 @@ class WorkerCommand extends AbstractCommand
             }
         }
         $lock->unlock();
+        $exo->getLogger()->debug("Exiting", ['executions' => $executionCount]);
         return 0;
     }
 }

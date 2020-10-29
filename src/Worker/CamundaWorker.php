@@ -25,6 +25,11 @@ class CamundaWorker implements WorkerInterface
         $this->username = $options['USERNAME'] ?? null;
         $this->password = $options['PASSWORD'] ?? null;
         $this->workerId = $options['WORKER_ID'] ?? 'exo-' . time();
+
+        if (!$this->url) {
+            throw new RuntimeException("Required URL for Camunda worker not configured (correctly)");
+        }
+
         $topics = [];
         foreach ($exo->getActions() as $action) {
             $topic = [
@@ -46,10 +51,11 @@ class CamundaWorker implements WorkerInterface
         }
         $this->topics = $topics;
         // print_r($topics); exit();
+    }
 
-        if (!$this->url) {
-            throw new RuntimeException("No Camunda url provided");
-        }
+    public function connect(): void
+    {
+        // noop on pull-based adapters
     }
 
     public function popRequest(): ?array
@@ -92,7 +98,7 @@ class CamundaWorker implements WorkerInterface
         return null;
     }
 
-    public function pushResponse(array $response): void
+    public function pushResponse(array $request, array $response): void
     {
         if ($response['status'] == 'OK') {
             // success
@@ -126,17 +132,21 @@ class CamundaWorker implements WorkerInterface
                     $body['variables'][$k] = $variable;
                 }
             }
-            $res = $this->request('POST', '/external-task/' . $response['request']['id'] . '/complete', $body);
+            $res = $this->request('POST', '/external-task/' . $request['id'] . '/complete', $body);
         } else {
+            $errorDetails = $response['error'] ?? null;
+            if (is_array($errorDetails)) {
+                $errorDetails = implode(PHP_EOL, $errorDetails);
+            }
             $body = [
                 'workerId' => $this->workerId,
                 'errorMessage' => 'Task failed to execute',
                 'retries' => 0,
-                'errorDetails' => $response['error'] ?? null,
+                'errorDetails' => $errorDetails,
                 'retryTimeout' => 10 * 1000,
             ];
             // echo "Reporting failure\n";
-            $res = $this->request('POST', '/external-task/' . $response['request']['id'] . '/failure', $body);
+            $res = $this->request('POST', '/external-task/' . $request['id'] . '/failure', $body);
         }
         return;
     }

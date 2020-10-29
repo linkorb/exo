@@ -10,6 +10,10 @@
       "type": "string",
       "description": "Unique request identifier"
     },
+    "reply-to": {
+      "type": "string",
+      "description": "Optional reply-to address (worker adapter implementation specific)"
+    },
     "action": {
       "type": "string",
       "description": "Full Qualified Action name"

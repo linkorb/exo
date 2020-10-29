@@ -117,7 +117,7 @@ If the action has any output variables, they are specified in the `output` objec
 
 ## Variables (URLs, Credentials, etc)
 
-You can variables and secrets to your exo instance as environment variables. Make sure the environment variables are prefixed with `EXO__VARIABLE__`. For example: 
+You can variables and secrets to your exo instance as environment variables. Make sure the environment variables are prefixed with `EXO__VARIABLE__`. For example:
 
     EXO__VARIABLE__MATTERMOST_URL=https://mattermost.example.com/hooks/xyz123abc
 
@@ -133,28 +133,49 @@ You can run Exo as a worker. In this mode, Exo waits for requests, executes them
 
 To know where to find requests, you can specify the type of worker, and any options that worker needs to be instantiated.
 
-Currently the Camunda worker is available. In the future a Kafka, Rabbitmq, or any other type of worker can be implemented easily.
+Currently the [NATS](https://nats.io/) and [Camunda](https://camunda.com/) workers are available. In the future a Kafka, Rabbitmq, or any other type of worker can be implemented easily.
 
 To run the worker, simply run:
 
     bin/exo worker
 
+
+### NATS Worker
+
+The Camunda worker requires the following environment variables:
+
+* `EXO__WORKER__TYPE`: Worker implementation: `Nats`
+* `EXO__WORKER__NATS__HOST`: Hostname of the NATS server, i.e. `nats.example.com`
+* `EXO__WORKER__NATS__PORT`: Port number of the NATS server, i.e. `4222` (defaut)
+* `EXO__WORKER__NATS__USERNAME`: Username to authenticate with, i.e. `exo`
+* `EXO__WORKER__NATS__PASSWORD`: Password to authenticate with
+
+You can now publish requests onto the `exo:request` "subject".
+
+Note that the worker expects the payload to be a gzipped JSON string representing a regular Exo request.
+
+It will use the NATS request/response mechanism to respond to the request with a gzipped JSON string representing a regular Exo response.
+
+To test you can use the included `nats-request` command to send a request on STDIN, and receive a response on STDOUT. This command uses the worker's NATS environment variables to setup the connection to the NATS server.
+
+* `./bin/console nats-request < request.json`
+
 ### Camunda Worker
 
 The Camunda worker requires the following environment variables:
 
-* `EXO__WORKER__TYPE`: Worker implementation, i.e. `Camunda`
-* `EXO__WORKER__URL`: Base URL for the Camunda REST API, i.e. `http://127.0.0.1:8888/engine-rest`
-* `EXO__WORKER__USERNAME`: Username to authenticate with, i.e. `exo`
-* `EXO__WORKER__PASSWORD`: Password to authenticate with
-    
+* `EXO__WORKER__TYPE`: Worker implementation: `Camunda`
+* `EXO__WORKER__CAMUNDA__URL`: Base URL for the Camunda REST API, i.e. `http://127.0.0.1:8888/engine-rest`
+* `EXO__WORKER__CAMUNDA__USERNAME`: Username to authenticate with, i.e. `exo`
+* `EXO__WORKER__CAMUNDA__PASSWORD`: Password to authenticate with
+
 It is recommended to create a dedicated user for Exo. This way each task is performed by the appropriate user, ensuring that Camunda permissions and logging are correctly related to Exo.
 
 Once the worker is running, you can now create "Service Tasks" in your processes that trigger Exo actions.
 
 In the Camunda modeler, create a "Task" and use the wrench to turn it into a "Service Task".
 
-In the Properties Panel, set the Implementation as "External", and enter a topic. The Topic should always be prefixed with `exo:` followed by the action name you'd like to execute. For example: `exo:smtp-send`. 
+In the Properties Panel, set the Implementation as "External", and enter a topic. The Topic should always be prefixed with `exo:` followed by the action name you'd like to execute. For example: `exo:smtp-send`.
 
 Open the Input/Output tab to specify input variables to your action. You can use any process variables and exo variables.
 
@@ -164,13 +185,23 @@ Example inputs:
 * `from`: `Exo bot`
 * `subject`: `Hello world!`
 * `body`: `This is a demo`
-* `dsn`: `smtp://user:pass@mail.example.web` 
+* `dsn`: `smtp://user:pass@mail.example.web`
 
 You can also specify an environment variable called `EXO__VARIABLES__SMTP_DSN` and specify `{{SMTP_DSN}}` as the `dsn` value. This way you don't need to hard-code the SMTP details in your BPMN process.
 
 You can also specify `${someProcessVariable}` as a value to inject a process variable.
 
 For actions that have output variables, you may wish to rename those before injecting them back into your process. For example, if a `get-user-data` action returns a `user` object, you may wish to rename this to `customer` (in order not to overwrite or handle multiple `user` variables in your process). This can be achieved by specifying an input variable `>user` with value `customer`.
+
+## Logging
+
+Exo and all it's commands support PSR-3 based logging. To log to a file, specify the following environment variable:
+
+* `EXO_LOG=/var/log/exo.log`
+
+Under the hood, Exo uses [monolog](https://github.com/Seldaek/monolog), meaning you can easily add [any of it's many handlers](https://seldaek.github.io/monolog/doc/02-handlers-formatters-processors.html) to log to email, slack, graylog, elastic, syslog, etc.
+
+When running Exo through `./bin/console` you can pass `-v` to send log output to STDOUT (in addition to the optional log file).
 
 ## License
 

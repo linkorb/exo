@@ -31,5 +31,6 @@ $application->setCatchExceptions(false);
 $application->add(new \Exo\Console\Command\ActionCommand());
 $application->add(new \Exo\Console\Command\RunCommand());
 $application->add(new \Exo\Console\Command\RequestCommand());
+$application->add(new \Exo\Console\Command\NatsRequestCommand());
 $application->add(new \Exo\Console\Command\WorkerCommand());
 $application->run();

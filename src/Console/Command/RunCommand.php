@@ -38,7 +38,7 @@ class RunCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $exo = $this->getExo();
+        $exo = $this->getExo($input, $output);
         $inputArray = [];
 
         foreach ($input->getOption('input') as $pair) {
@@ -54,7 +54,7 @@ class RunCommand extends AbstractCommand
             'action' => $fqan,
             'input' => $inputArray,
         ];
-    
+
         $action = $exo->getAction($fqan);
         $response = $exo->handle($request);
         $output->writeLn(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));

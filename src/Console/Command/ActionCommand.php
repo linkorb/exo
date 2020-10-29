@@ -32,7 +32,7 @@ class ActionCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $exo = $this->getExo();
+        $exo = $this->getExo($input, $output);
 
         $fqan = $input->getArgument('fqan');
         if (!$fqan) {
@@ -60,7 +60,7 @@ class ActionCommand extends AbstractCommand
         foreach ($action->getInputSchema()['properties'] as $name => $data) {
             $output->writeLn("  <info>{$name}</info>: " . ($data['description'] ?? null));
         }
-        
+
         if ($action->getOutputSchema()) {
             $output->writeLn('');
             $output->writeLn("Outputs:");

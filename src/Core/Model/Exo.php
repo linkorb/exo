@@ -12,6 +12,7 @@ use JsonSchema\Constraints\Constraint;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Psr\Log\LoggerInterface;
 
 /**
  * @method Action[]|TypedArray getActions()
@@ -26,8 +27,9 @@ class Exo extends AbstractModel
     protected $requestSchema;
     protected $responseSchema;
 
-    public function __construct()
+    public function __construct(LoggerInterface $logger)
     {
+        $this->logger = $logger;
         $this->actions = new TypedArray(Action::class);
         // $this->packages = new TypedArray(Package::class);
 
@@ -43,10 +45,20 @@ class Exo extends AbstractModel
         $this->variables = ArrayUtils::getByPrefix(getenv(), 'EXO__VARIABLE__');
     }
 
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    public function hasAction(string $fqan): bool
+    {
+        return $this->getActions()->hasKey($fqan);
+    }
+
     public function getAction(string $fqan): Action
     {
 
-        if (!$this->getActions()->hasKey($fqan)) {
+        if (!$this->hasAction($fqan)) {
             throw new Exception\UnknownActionException("Unknown action: " . $fqan);
         }
         $action = $this->getActions()->get($fqan);
@@ -67,11 +79,30 @@ class Exo extends AbstractModel
     //     return $config;
     // }
 
+
+    public function safeHandle(array $request): array
+    {
+        try {
+            $response = $this->handle($request);
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 'ERROR',
+                'error' => [
+                    get_class($e) . ': ' . $e->getMessage(),
+                ]
+            ];
+        }
+        return $response;
+    }
+
     public function handle(array $request): array
     {
+        $this->getLogger()->notice("Request", ['request' => $request]);
+
         JsonUtils::validateArray($request, $this->requestSchema);
         $fqan = $request['action'] ?? null;
         $requestId = $request['id'] ?? null;
+
         $action = $this->getAction($fqan);
         // $package = $action->getPackage();
 
@@ -154,6 +185,9 @@ class Exo extends AbstractModel
                 unset($response['output'][$name]);
             }
         }
+
+        $this->getLogger()->info("Response", ['response' => $response]);
+
         return $response;
     }
 }

@@ -27,10 +27,10 @@ class RequestCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $exo = $this->getExo();
+        $exo = $this->getExo($input, $output);
         $inputArray = [];
 
-        
+
         $stdin = file_get_contents("php://stdin");
         $request = json_decode($stdin, true);
         if (!$request) {
@@ -40,7 +40,7 @@ class RequestCommand extends AbstractCommand
         if (!$fqan) {
             throw new RuntimeException("Action undefined in request");
         }
-        
+
         $action = $exo->getAction($fqan);
         $response = $exo->handle($request);
         $output->writeLn(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
