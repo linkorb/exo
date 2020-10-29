@@ -70,7 +70,7 @@ class CamundaWorker implements WorkerInterface
         $rows = $this->request('POST', '/external-task/fetchAndLock', $body);
 
         if (count($rows) > 0) {
-            print_r($rows);
+            // print_r($rows);
             foreach ($rows as $row) {
                 $request = [
                     'id' => $row['id'],
@@ -87,8 +87,7 @@ class CamundaWorker implements WorkerInterface
                         $request['input'][$name] = $v['value'] ?? null;
                     }
                 }
-
-                print_r($request); //exit();
+                // print_r($request); //exit();
 
                 return $request;
             }
