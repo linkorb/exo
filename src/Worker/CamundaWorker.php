@@ -38,7 +38,7 @@ class CamundaWorker implements WorkerInterface
             };
             $outputSchema = $action->getOutputSchema();
             if ($outputSchema) {
-                foreach ($outputSchema['properties'] as $k => $v) {
+                foreach (($outputSchema['properties'] ?? []) as $k => $v) {
                     $topic['variables'][] = '>' . $k;
                 };
             }
