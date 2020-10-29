@@ -29,7 +29,14 @@ class WorkerCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $lock = new PidHelper('/run/user/' . posix_getuid() . '/', 'exo-worker.pid');
+        $pidPath = '/run/user/' . posix_getuid() . '/';
+        if (posix_getuid()==0) {
+            // root doesn't have a user-specific run dir
+            // and /var/run is only writable by root
+            $pidPath = '/var/run/';
+        }
+
+        $lock = new PidHelper($pidPath, 'exo-worker.pid');
         if (!$lock->lock()) {
             $output->writeln('<error>Other worker process running, quiting.</error>');
 
@@ -58,7 +65,7 @@ class WorkerCommand extends AbstractCommand
             $exo->getLogger()->debug("Running", ['executions' => $executionCount]);
             $request = $adapter->popRequest();
             if ($request) {
-                $response = $exo->safeHandle($request);
+                $response = $exo->handle($request);
                 $adapter->pushResponse($request, $response);
                 $executionCount++;
             } else {
