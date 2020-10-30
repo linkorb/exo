@@ -29,21 +29,26 @@ class WorkerCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $pidPath = '/run/user/' . posix_getuid() . '/';
-        if (posix_getuid()==0) {
-            // root doesn't have a user-specific run dir
-            // and /var/run is only writable by root
-            $pidPath = '/var/run/';
-        }
-
-        $lock = new PidHelper($pidPath, 'exo-worker.pid');
-        if (!$lock->lock()) {
-            $output->writeln('<error>Other worker process running, quiting.</error>');
-
-            return -1;
-        }
-
         $exo = $this->getExo($input, $output);
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $pidPath = '/run/user/' . posix_getuid() . '/';
+            if (posix_getuid()==0) {
+                // root doesn't have a user-specific run dir
+                // and /var/run is only writable by root
+                $pidPath = '/var/run/';
+            }
+
+            $lock = new PidHelper($pidPath, 'exo-worker.pid');
+            if (!$lock->lock()) {
+                $output->writeln('<error>Other worker process running, quiting.</error>');
+
+                return -1;
+            }
+        } else {
+            $exo->getLogger()->debug("Skipping PID locking. Not supported on windows");
+        }
+
 
         $workerType = getenv('EXO__WORKER__TYPE');
         $variables = getenv();
@@ -79,7 +84,9 @@ class WorkerCommand extends AbstractCommand
                 $running = false;
             }
         }
-        $lock->unlock();
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $lock->unlock();
+        }
         $exo->getLogger()->debug("Exiting", ['executions' => $executionCount]);
         return 0;
     }
