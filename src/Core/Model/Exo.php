@@ -45,6 +45,11 @@ class Exo extends AbstractModel
         $this->variables = ArrayUtils::getByPrefix(getenv(), 'EXO__VARIABLE__');
     }
 
+    public function getId(): string
+    {
+        return getenv('EXO_ID') ?? 'Undefined';
+    }
+
     public function getLogger(): LoggerInterface
     {
         return $this->logger;
@@ -97,6 +102,7 @@ class Exo extends AbstractModel
 
     public function handle(array $request): array
     {
+        $processingStart = microtime(true);
         $this->getLogger()->notice("Request", ['request' => $request]);
 
         JsonUtils::validateArray($request, $this->requestSchema);
@@ -172,6 +178,16 @@ class Exo extends AbstractModel
                 'id' => $requestId,
             ];
         }
+
+        $processingEnd = microtime(true);
+
+        $headers = [
+            'exoId' => $this->getId(),
+            'hostname' => gethostname(),
+            'processingStart' => $processingStart,
+            'processingDuration' => ($processingEnd - $processingStart),
+        ];
+        $response = array_merge(['headers' => $headers], $response);
         JsonUtils::validateArray($response, $this->responseSchema);
 
         $output = $response['output'] ?? [];

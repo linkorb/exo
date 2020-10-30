@@ -54,7 +54,7 @@ class WorkerCommand extends AbstractCommand
         $variables = getenv();
         $options = ArrayUtils::getByPrefix($variables, 'EXO__WORKER__' . strtoupper($workerType) . '__');
 
-        $exo->getLogger()->info("Starting worker", ['workerType' => $workerType]);
+        $exo->getLogger()->info("Starting worker", ['workerType' => $workerType, 'exoId' => $exo->getId()]);
         $className = 'Exo\\Worker\\' . $workerType . 'Worker';
         $adapter = new $className($exo, $options);
 
