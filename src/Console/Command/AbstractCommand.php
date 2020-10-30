@@ -28,7 +28,7 @@ abstract class AbstractCommand extends Command
         }
 
         if ($output->isVerbose()) {
-            $logger->pushHandler(new StreamHandler('/dev/stdout', Logger::DEBUG));
+            $logger->pushHandler(new StreamHandler(STDOUT, Logger::DEBUG));
         }
 
         // Instantiate Exo instance
