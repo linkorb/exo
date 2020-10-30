@@ -19,7 +19,13 @@ class RequestCommand extends AbstractCommand
 
         $this
             ->setName('request')
-            ->setDescription('Handle a request');
+            ->setDescription('Handle a request')
+            ->addArgument(
+                'filename',
+                InputArgument::OPTIONAL,
+                'Filename containing request as JSON (use STDIN if not provided)'
+            )
+        ;
     }
 
     /**
@@ -31,8 +37,12 @@ class RequestCommand extends AbstractCommand
         $inputArray = [];
 
 
-        $stdin = file_get_contents("php://stdin");
-        $request = json_decode($stdin, true);
+        $filename = $input->getArgument('filename');
+        if (!$filename) {
+            $filename = "php://stdin";
+        }
+        $requestJson = file_get_contents($filename);
+        $request = json_decode($requestJson, true);
         if (!$request) {
             throw new RuntimeException("Can't parse request JSON");
         }

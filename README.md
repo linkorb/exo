@@ -34,7 +34,9 @@ To test it out:
     bin/exo run hello-php -i greeting=Hello -i name=Alice
 
     # Handle a full JSON request
-    bin/exo request < request.json
+    bin/exo request < request.json # load request from stdin
+    bin/exo request request.json # load request from file
+
 
 ## Custom actions
 
@@ -156,9 +158,10 @@ Note that the worker expects the payload to be a gzipped JSON string representin
 
 It will use the NATS request/response mechanism to respond to the request with a gzipped JSON string representing a regular Exo response.
 
-To test you can use the included `nats-request` command to send a request on STDIN, and receive a response on STDOUT. This command uses the worker's NATS environment variables to setup the connection to the NATS server.
+To test you can use the included `nats-request` command to send a request (as JSON over STDIN or by providing a filename), and receive a response on STDOUT. This command uses the worker's NATS environment variables to setup the connection to the NATS server.
 
-* `./bin/console nats-request < request.json`
+* `./bin/console nats-request < request.json` # load request from STDIN
+* `./bin/console nats-request request.json` # load request from filename
 
 ### Camunda Worker
 

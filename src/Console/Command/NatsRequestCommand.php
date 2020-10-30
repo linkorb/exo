@@ -19,7 +19,13 @@ class NatsRequestCommand extends AbstractCommand
 
         $this
             ->setName('nats-request')
-            ->setDescription('Send a request over NATS');
+            ->setDescription('Send a JSON request over NATS.')
+            ->addArgument(
+                'filename',
+                InputArgument::OPTIONAL,
+                'Filename containing request as JSON (use STDIN if not provided)'
+            )
+        ;
     }
 
     /**
@@ -30,10 +36,14 @@ class NatsRequestCommand extends AbstractCommand
         $exo = $this->getExo($input, $output);
         $inputArray = [];
 
-        $stdin = file_get_contents("php://stdin");
-        $request = json_decode($stdin, true);
+        $filename = $input->getArgument('filename');
+        if (!$filename) {
+            $filename = "php://stdin";
+        }
+        $requestJson = file_get_contents($filename);
+        $request = json_decode($requestJson, true);
         if (!$request) {
-            throw new RuntimeException("Can't parse request JSON");
+            throw new RuntimeException("Can't parse request JSON from " . $filename);
         }
 
         $connectionOptions = new \Nats\ConnectionOptions();
@@ -56,7 +66,7 @@ class NatsRequestCommand extends AbstractCommand
         $this->client->connect();
 
         $subject = 'exo:request';
-        $payload = gzencode($stdin);
+        $payload = gzencode($requestJson);
 
         $exo->getLogger()->info("Sending NATS request", ['request' => $request]);
 
@@ -66,13 +76,13 @@ class NatsRequestCommand extends AbstractCommand
             $payload,
             function ($message) use (&$response, $exo) {
                 // echo "Got a response...\n";
-                $json = gzdecode($message->getBody());
-                $response = json_decode($json, true);
+                $responseJson = gzdecode($message->getBody());
+                $response = json_decode($responseJson, true);
                 if (!$response) {
-                    $exo->getLogger()->error("Failed to parse response as JSON", ['response' => $json]);
-                    throw new RuntimeException("Failed to parse response as JSON: " . $json);
+                    $exo->getLogger()->error("Failed to parse response as JSON", ['responseJson' => $responseJson]);
+                    throw new RuntimeException("Failed to parse response as JSON: " . $responseJson);
                 }
-                $exo->getLogger()->debug("Received response", ['response' => $json]);
+                $exo->getLogger()->debug("Received response", ['response' => $responseJson]);
                 echo json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) . PHP_EOL;
             }
         );
