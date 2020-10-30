@@ -13,7 +13,7 @@ class NatsWorker implements WorkerInterface
     protected $port;
     protected $username;
     protected $password;
-    protected $workerId;
+    protected $streamContextOptions;
     protected $messages = [];
 
     public function __construct(Exo $exo, array $options)
@@ -23,7 +23,12 @@ class NatsWorker implements WorkerInterface
         $this->port = $options['PORT'] ?? 4222;
         $this->username = $options['USERNAME'] ?? null;
         $this->password = $options['PASSWORD'] ?? null;
-        $this->workerId = $options['WORKER_ID'] ?? 'exo-' . time();
+        $this->streamContextOptions = ['ssl' => []];
+
+        if (($options['SSL__VERIFY_PEER']??null)=='false') {
+            $exo->getLogger()->debug("Setting ssl.verify_peer to false");
+            $this->streamContextOptions['ssl']['verify_peer'] = false;
+        }
 
         if (!$this->host) {
             throw new RuntimeException("Required HOST for Nats worker not configured (correctly)");
@@ -34,6 +39,9 @@ class NatsWorker implements WorkerInterface
     {
         $this->exo->getLogger()->info("Connecting to {$this->host}:{$this->port}");
         $connectionOptions = new \Nats\ConnectionOptions();
+
+        $streamContext = stream_context_get_default($this->streamContextOptions);
+
         $connectionOptions
             ->setHost($this->host)
             ->setPort($this->port)
@@ -41,6 +49,7 @@ class NatsWorker implements WorkerInterface
             ->setPass($this->password)
             ->setVerbose(true)
             ->setPedantic(true)
+            ->setStreamContext($streamContext)
         ;
 
         $this->client = new \Nats\Connection($connectionOptions);

@@ -46,12 +46,25 @@ class NatsRequestCommand extends AbstractCommand
             throw new RuntimeException("Can't parse request JSON from " . $filename);
         }
 
+        $streamContextOptions = [
+            'ssl' => [
+            ],
+        ];
+
+
+
         $connectionOptions = new \Nats\ConnectionOptions();
 
         $this->host = getenv('EXO__WORKER__NATS__HOST');
         $this->port = getenv('EXO__WORKER__NATS__PORT') ?? 4222;
         $this->username = getenv('EXO__WORKER__NATS__USERNAME');
         $this->password = getenv('EXO__WORKER__NATS__PASSWORD');
+
+        if (getenv('EXO__WORKER__NATS__SSL__VERIFY_PEER')=='false') {
+            $exo->getLogger()->debug("Setting ssl.verify_peer to false");
+            $streamContextOptions['ssl']['verify_peer'] = false;
+        }
+        $streamContext = stream_context_get_default($streamContextOptions);
 
         $connectionOptions
             ->setHost($this->host)
@@ -60,6 +73,7 @@ class NatsRequestCommand extends AbstractCommand
             ->setPass($this->password)
             ->setVerbose(true)
             ->setPedantic(true)
+            ->setStreamContext($streamContext)
         ;
 
         $this->client = new \Nats\Connection($connectionOptions);

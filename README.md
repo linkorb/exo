@@ -151,6 +151,7 @@ The Camunda worker requires the following environment variables:
 * `EXO__WORKER__NATS__PORT`: Port number of the NATS server, i.e. `4222` (defaut)
 * `EXO__WORKER__NATS__USERNAME`: Username to authenticate with, i.e. `exo`
 * `EXO__WORKER__NATS__PASSWORD`: Password to authenticate with
+* `EXO__WORKER__NATS__SSL__VERIFY_PEER`: Configure steam context SSL option `verify_peer` (defaults to `true`)
 
 You can now publish requests onto the `exo:request` "subject".
 
