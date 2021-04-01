@@ -21,7 +21,6 @@
     "require": {
         "php": ">=7.0",
         "andrewfenn/pid-helper": "^0.1.0",
-        "gnello/php-mattermost-driver": "^2.12",
         "justinrainbow/json-schema": "^5.0",
         "linkorb/boost": "^1.0",
         "linkorb/collection": "^1.0",
@@ -37,7 +36,6 @@
         "symfony/process": "^3.0|^4.0|^5.0",
         "symfony/property-access": "^5.1",
         "symfony/yaml": "^3.0|^4.0|^5.0",
-        "thibaud-dauce/mattermost-php": "^1.2",
         "workfront/nats": "^2.0"
     },
     "config": {
