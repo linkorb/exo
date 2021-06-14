@@ -197,6 +197,18 @@ You can also specify `${someProcessVariable}` as a value to inject a process var
 
 For actions that have output variables, you may wish to rename those before injecting them back into your process. For example, if a `get-user-data` action returns a `user` object, you may wish to rename this to `customer` (in order not to overwrite or handle multiple `user` variables in your process). This can be achieved by specifying an input variable `>user` with value `customer`.
 
+## Reporting
+
+You can optionally configure the Exo worker to report heartbeats and request details to an external system using HTTP webhook requests.
+
+Example configuration:
+
+```ini
+EXO_REPORTING_URL=https://my.example.com/reporting/1234567890
+```
+
+Exo will append `/heartbeat`, `/success`, `/info`, etc to this URL where applicable, and report details as URL query parameters (i.e. `?message=...`)
+
 ## Logging
 
 Exo and all it's commands support PSR-3 based logging. To log to a file, specify the following environment variable:
