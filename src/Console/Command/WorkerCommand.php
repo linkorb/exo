@@ -72,14 +72,14 @@ class WorkerCommand extends AbstractCommand
             $exo->getLogger()->debug("Running", ['executions' => $executionCount, 'loops' => $loops]);
             if ($reportingUrl) {
                 // report "heartbeat"
-                $url = $reportingUrl .= '?executions=' . $executionCount . '&message=heartbeat';
+                $url = $reportingUrl .= '/heartbeat?executions=' . $executionCount;
                 $res = file_get_contents($url);
             }
             $request = $adapter->popRequest();
             if ($request) {
                 if ($reportingUrl) {
                     // report the request action
-                    $url = $reportingUrl .= '?request=' . urlencode(json_encode($request, JSON_UNESCAPED_SLASHES)) . '&message=' . ($request['action'] ?? '?');
+                    $url = $reportingUrl .= '/info?request=' . urlencode(json_encode($request, JSON_UNESCAPED_SLASHES)) . '&message=' . ($request['action'] ?? '?');
                     $res = file_get_contents($url);
                 }
                 $response = $exo->handle($request);
