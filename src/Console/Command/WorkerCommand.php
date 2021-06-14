@@ -50,6 +50,7 @@ class WorkerCommand extends AbstractCommand
         }
 
 
+        $reportingUrl = getenv('EXO_REPORTING_URL');
         $workerType = getenv('EXO__WORKER__TYPE');
         $variables = getenv();
         $options = ArrayUtils::getByPrefix($variables, 'EXO__WORKER__' . strtoupper($workerType) . '__');
@@ -66,15 +67,28 @@ class WorkerCommand extends AbstractCommand
         $adapter->connect();
 
         $running = true;
+        $loops = 0;
         while ($running) {
-            $exo->getLogger()->debug("Running", ['executions' => $executionCount]);
+            $exo->getLogger()->debug("Running", ['executions' => $executionCount, 'loops' => $loops]);
+            if ($reportingUrl) {
+                // report "heartbeat"
+                $url = $reportingUrl .= '?executions=' . $executionCount . '&message=heartbeat';
+                $res = file_get_contents($url);
+            }
             $request = $adapter->popRequest();
             if ($request) {
+                if ($reportingUrl) {
+                    // report the request action
+                    $url = $reportingUrl .= '?request=' . urlencode(json_encode($request, JSON_UNESCAPED_SLASHES)) . '&message=' . ($request['action'] ?? '?');
+                    $res = file_get_contents($url);
+                }
                 $response = $exo->handle($request);
                 $adapter->pushResponse($request, $response);
                 $executionCount++;
             } else {
-                sleep(3);
+                $seconds = 3;
+                $exo->getLogger()->debug("Empty request. Sleeping.", ['seconds' => $seconds]);
+                sleep($seconds);
             }
 
             if (time() > ($startAt + $maxRuntime)) {
@@ -83,11 +97,13 @@ class WorkerCommand extends AbstractCommand
             if ($executionCount >= $maxExecutionCount) {
                 $running = false;
             }
+            $loops++;
         }
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             $lock->unlock();
         }
-        $exo->getLogger()->debug("Exiting", ['executions' => $executionCount]);
-        return 0;
+        $code = 0;
+        $exo->getLogger()->info("Exiting", ['executions' => $executionCount, 'code' => $code]);
+        return $code;
     }
 }
