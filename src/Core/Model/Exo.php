@@ -161,13 +161,17 @@ class Exo extends AbstractModel
         //     $env[$k] = $v;
         // }
         $stdin = json_encode($request, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        
         $process = new Process(array($interpreter, $handlerFilename), $cwd, $env, $stdin);
+        $this->getLogger()->notice("Running", ['interpreter' => $interpreter, 'handlerFilename' => $handlerFilename]);
         $process->run();
         if (!$process->isSuccessful()) {
+            $this->getLogger()->notice("Run failed");
             throw new ProcessFailedException($process);
         }
-
+        $this->getLogger()->notice("Run completed");
         $output = $process->getOutput();
+        $this->getLogger()->notice("Output: " . $output);
         $response = json_decode($output, true);
         if (!$response) {
             throw new Exception\InvalidResponseException($output);
