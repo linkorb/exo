@@ -92,9 +92,11 @@ class WorkerCommand extends AbstractCommand
             }
 
             if (time() > ($startAt + $maxRuntime)) {
+                $exo->getLogger()->debug("Reached max runtime", ['maxRuntime' => $maxRuntime]);
                 $running = false;
             }
             if ($executionCount >= $maxExecutionCount) {
+                $exo->getLogger()->debug("Reached max execution count", ['maxExecutionCount' => $maxExecutionCount]);
                 $running = false;
             }
             $loops++;
