@@ -30,7 +30,7 @@ class WorkerCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $exo = $this->getExo($input, $output);
-
+        $flock = null; // only used on windows
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             $pidPath = '/run/user/' . posix_getuid() . '/';
             if (posix_getuid()==0) {
@@ -41,12 +41,17 @@ class WorkerCommand extends AbstractCommand
 
             $lock = new PidHelper($pidPath, 'exo-worker.pid');
             if (!$lock->lock()) {
-                $output->writeln('<error>Other worker process running, quiting.</error>');
-
+                $exo->getLogger()->debug('Could not obtain PID lock. Other worker process running, quiting.');
                 return -1;
             }
         } else {
-            $exo->getLogger()->debug("Skipping PID locking. Not supported on windows");
+            $exo->getLogger()->debug("Skipping PID locking. Not supported on windows. Flocking instead");
+            $flockfile = __DIR__ . '/../../../exo.flock'; // default to project root
+            $flock = fopen($flockfile, 'w'); // open for writing
+            if (!flock($flock, LOCK_EX|LOCK_NB)) { // aquire exclusive lock
+                $exo->getLogger()->debug("Could not obtain exclusive flock. Already running?");
+                return -1;
+            }
         }
 
 
@@ -60,9 +65,9 @@ class WorkerCommand extends AbstractCommand
         $adapter = new $className($exo, $options);
 
         $startAt = time();
-        $maxRuntime = 60 * 30; // seconds
+        $maxRuntime = 60 * 60 * 24; // seconds
         $executionCount  = 0;
-        $maxExecutionCount = 100;
+        $maxExecutionCount = 1000;
 
         $adapter->connect();
 
@@ -103,6 +108,8 @@ class WorkerCommand extends AbstractCommand
         }
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             $lock->unlock();
+        } else {
+            flock($flock, LOCK_UN);
         }
         $code = 0;
         $exo->getLogger()->info("Exiting", ['executions' => $executionCount, 'code' => $code]);
