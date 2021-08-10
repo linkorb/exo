@@ -30,6 +30,28 @@ class WorkerCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $exo = $this->getExo($input, $output);
+
+        $reportingUrl = getenv('EXO_REPORTING_URL');
+        $workerType = getenv('EXO__WORKER__TYPE');
+
+        $variables = getenv();
+        $options = ArrayUtils::getByPrefix($variables, 'EXO__WORKER__' . strtoupper($workerType) . '__');
+
+        $streamContextOptions = ['ssl' => []];
+
+        if (($options['SSL__VERIFY_PEER']??null)=='false') {
+            $exo->getLogger()->debug("Setting ssl.verify_peer to false");
+            $streamContextOptions['ssl']['verify_peer'] = false;
+        }
+        $streamContext = stream_context_get_default($streamContextOptions);
+
+
+
+        if ($reportingUrl) {
+            // report "heartbeat"
+            $url = $reportingUrl . '/start';
+            $res = file_get_contents($url, false, $streamContext);
+        }
         $flock = null; // only used on windows
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             $pidPath = '/run/user/' . posix_getuid() . '/';
@@ -42,7 +64,7 @@ class WorkerCommand extends AbstractCommand
             $lock = new PidHelper($pidPath, 'exo-worker.pid');
             if (!$lock->lock()) {
                 $exo->getLogger()->debug('Could not obtain PID lock. Other worker process running, quiting.');
-                return -1;
+                return 0;
             }
         } else {
             $exo->getLogger()->debug("Skipping PID locking. Not supported on windows. Flocking instead");
@@ -50,22 +72,25 @@ class WorkerCommand extends AbstractCommand
             $flock = fopen($flockfile, 'w'); // open for writing
             if (!flock($flock, LOCK_EX|LOCK_NB)) { // aquire exclusive lock
                 $exo->getLogger()->debug("Could not obtain exclusive flock. Already running?");
-                return -1;
+
+                if ($reportingUrl) {
+                    // report "heartbeat"
+                    $url = $reportingUrl . '/info?flock-exit=true';
+                    $res = file_get_contents($url);
+                }
+                return 0;
             }
         }
 
 
-        $reportingUrl = getenv('EXO_REPORTING_URL');
-        $workerType = getenv('EXO__WORKER__TYPE');
-        $variables = getenv();
-        $options = ArrayUtils::getByPrefix($variables, 'EXO__WORKER__' . strtoupper($workerType) . '__');
-
+      
+       
         $exo->getLogger()->info("Starting worker", ['workerType' => $workerType, 'exoId' => $exo->getId()]);
         $className = 'Exo\\Worker\\' . $workerType . 'Worker';
         $adapter = new $className($exo, $options);
 
         $startAt = time();
-        $maxRuntime = 60 * 60 * 24; // seconds
+        $maxRuntime = 60 * 60 * 24; // 24h in seconds
         $executionCount  = 0;
         $maxExecutionCount = 1000;
 
@@ -80,14 +105,28 @@ class WorkerCommand extends AbstractCommand
                 $url = $reportingUrl . '/heartbeat?executions=' . $executionCount;
                 $res = file_get_contents($url);
             }
+            // $exo->getLogger()->debug("POP request start", ['executions' => $executionCount, 'loops' => $loops]);
             $request = $adapter->popRequest();
+            // $exo->getLogger()->debug("POP request end", ['executions' => $executionCount, 'loops' => $loops]);
             if ($request) {
                 if ($reportingUrl) {
                     // report the request action
                     $url = $reportingUrl . '/info?request=' . urlencode(json_encode($request, JSON_UNESCAPED_SLASHES)) . '&message=' . ($request['action'] ?? '?');
-                    $res = file_get_contents($url);
+                    //$res = file_get_contents($url);
                 }
-                $response = $exo->handle($request);
+                try {
+                    // $exo->getLogger()->debug("Start handler", ['executions' => $executionCount, 'loops' => $loops]);
+                    $response = $exo->handle($request);
+                } catch (\Exception $e) {
+                    $url = $reportingUrl . '/error?message=' . urlencode($e->getMessage());
+                    $res = file_get_contents($url);
+                    $response = [
+                        'status' => 'ERROR',
+                        'error' => [
+                            $e->getMessage(),
+                        ],
+                    ];
+                }
                 $adapter->pushResponse($request, $response);
                 $executionCount++;
             } else {
