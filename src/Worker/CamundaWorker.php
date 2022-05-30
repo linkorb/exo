@@ -35,8 +35,10 @@ class CamundaWorker implements WorkerInterface
             $topic = [
                 'topicName' => 'exo:' . $action->getName(),
                 'lockDuration' => 10 * 1000,
-                'variables' => [],
+                // 'variables' => [],
+                'localVariables' => true,
             ];
+            /*
             $inputSchema = $action->getInputSchema();
             foreach ($inputSchema['properties'] as $k => $v) {
                 $topic['variables'][] = $k;
@@ -47,6 +49,7 @@ class CamundaWorker implements WorkerInterface
                     $topic['variables'][] = '>' . $k;
                 };
             }
+            */
             $topics[] = $topic;
         }
         $this->topics = $topics;
