@@ -34,7 +34,7 @@ class CamundaWorker implements WorkerInterface
         foreach ($exo->getActions() as $action) {
             $topic = [
                 'topicName' => 'exo:' . $action->getName(),
-                'lockDuration' => 10 * 1000,
+                'lockDuration' => 60 * 1000, // seconds * 1000
                 // 'variables' => [],
                 'localVariables' => true,
             ];
