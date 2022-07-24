@@ -133,6 +133,11 @@ class CamundaWorker implements WorkerInterface
                     }
                     $body['variables'][$k] = $variable;
                 }
+                if (count($body['variables'])==0) {
+                    // avoid deserialisation problems.
+                    // camunda expects an object, not an array. php serialises empty objects as empty array
+                    unset($body['variables']);
+                }
             }
             $res = $this->request('POST', '/external-task/' . $request['id'] . '/complete', $body);
         } else {
