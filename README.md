@@ -144,7 +144,7 @@ To run the worker, simply run:
 
 ### NATS Worker
 
-The Camunda worker requires the following environment variables:
+The NATS worker requires the following environment variables:
 
 * `EXO__WORKER__TYPE`: Worker implementation: `Nats`
 * `EXO__WORKER__NATS__HOST`: Hostname of the NATS server, i.e. `nats.example.com`
